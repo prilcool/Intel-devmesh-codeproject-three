@@ -18,12 +18,14 @@ Run the following  jupyter notebook  Interest-on-account-audit-onemillion_record
 ! chmod 755 q; chmod 755 crack_md5_password.sh;if [ -x "$(command -v qsub)" ]; then ./q regression.sh; else ./crack_md5_password.sh; fi 
 
 
-On successfull run :
-You should be able to crack user Kim's  password .
+## On successfull run :
+
+You should be able to crack users passwords for those who have insecure passwords for example  Kim's  password 
+
 
 
 
 ## Result
 
-![alt text](https://github.com/prilcool/Intel-devmesh-codeproject-three/blob/main/Assets/result.PNG)
+![alt text](https://github.com/prilcool/Intel-devmesh-codeproject-three/blob/main/Assets/out.PNG)
 
