@@ -12,7 +12,7 @@ Ensure that you are using the q file ,crack_md5_password.sh  that is provided wi
 Ensure that file exist in  lab/crack_md5_password.cpp
 
 
-Run the following  jupyter notebook  Interest-on-account-audit-onemillion_records.ipynb
+Run the following  jupyter notebook  crack_md5_password.ipynb
 
 ## Than Run  the following command
 ! chmod 755 q; chmod 755 crack_md5_password.sh;if [ -x "$(command -v qsub)" ]; then ./q regression.sh; else ./crack_md5_password.sh; fi 
