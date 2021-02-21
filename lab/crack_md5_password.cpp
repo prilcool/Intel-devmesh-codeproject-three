@@ -24,16 +24,21 @@
 using namespace sycl;
 
 
-
 int main() {
     auto start_time = std::chrono::high_resolution_clock::now();
 
     //the size of your insecure password  guess list
-    constexpr int N=4; 
+    constexpr int N=6; 
     
     //select device to perform operations with  we selected cpu_selector
     
-    queue q(cpu_selector{});
+     // if you select a GPU device than Device: Intel(R) Graphics Gen9 [0x3e96] will process in 1 second.
+     queue q(cpu_selector{});
+    
+    //if you select a CPU device than Device: Intel(R) Xeon(R) E-2176G CPU @ 3.70GHz will process in 3 seconds.
+    //to use cpu un comment the below and comment the above.
+    //queue q(=gpu_selector{});
+ 
     
     std::cout << "Device: " << q.get_device().get_info<info::device::name>() << std::endl;
 
@@ -47,7 +52,8 @@ int main() {
     
     // this are the md5 hashed  passwords from the database this are user passwords that we will try and crack.
      const char *our_database_to_hack[]={"be6a7b58918d6a86dcd7165105a55735","9c5e6de58e6d4db5b6407ff633a731ea",
-                                         "91f279d26889d5383b8e44a3b17126f6","39efb1a1cb8b2ecb609016ccf672f2ba","73b1766d87521e37862e2303a1e0b217","05f4016d70e4c40860ae3698ccf6756b"}; 
+                                         "91f279d26889d5383b8e44a3b17126f6","39efb1a1cb8b2ecb609016ccf672f2ba",
+                                         "73b1766d87521e37862e2303a1e0b217","05f4016d70e4c40860ae3698ccf6756b"}; 
    
     
     // We load data into a array for ourlist of common insecure passwords ,this are our guesses
@@ -60,8 +66,7 @@ int main() {
     
     // so below is a preconverted MD5 list of the above loaded into an array .
    const char *insecure_password_list_hashed[] = {"e78258ed4cb53b88be9362fd439ded9d","42d717e8f76610bee6a103559135c577","3802627cb2fc0e1b993a636d229cfa3a",
-                                                  "05f4016d70e4c40860ae3698ccf6756b",
-                                                  "d6fc3939b3323b30564d01a44abb0bcb","be6a7b58918d6a86dcd7165105a55735"};
+                                                  "05f4016d70e4c40860ae3698ccf6756b","d6fc3939b3323b30564d01a44abb0bcb","be6a7b58918d6a86dcd7165105a55735"};
    
 
    //next we select a single password  md5 hash from our Database that we want to crack
@@ -81,16 +86,37 @@ int main() {
     // if our password matches it means its insecure and its index  stored into our cracked_passwords denoted by number 2. 
 
     
-    q.parallel_for(range<1>(N), [=](id<1> i) {   
-        const char *our_password_guess=insecure_password_list_hashed[i];
+    q.parallel_for(range<1>(N), [=](id<1> i) {
+        
+
+ 
+    const char * our_password_guess=insecure_password_list_hashed[i];
+                
+        
        
-        if (strcmp(our_password_guess,password_to_crack) == 0){
+        int password_found=0;  
+        
+        int password_not_found=0;
+         for(int k=0;k<32;k++){
+
+          if(our_password_guess[k]==password_to_crack[k]){ 
+                password_found++; 
+           }else{
+               password_not_found--; 
+        }
+        }
+       
+          if (password_found==32){
            cracked_passwords[i]=2;  //password found 
             
         }
         else{
          cracked_passwords[i]=1;  //password not found 
         }
+        
+       
+        
+
         
     }).wait();
           
@@ -101,9 +127,17 @@ int main() {
 
     for (int i = 0; i < N; i++) {
         if(cracked_passwords[i]==2){
+      std::cout<<" "<<std::endl;       
+      std::cout<<"FOUND IT "<<std::endl;         
       std::cout<<"Success !! Password Cracked At index "<<i<<" in common passwords list For Hash "<<insecure_password_list_hashed[i]<<" the password was "<<insecure_password_list[i]<<std::endl; 
       std::cout<<"Notify user "<<user<<" to change password immediatly as it's insecure"<<std::endl; 
+      std::cout<<"*********************************************"<<std::endl;      
+ 
       flag_no_password_cracked=2;
+        }else{
+            
+        std::cout<<"Not Matched "<<i<<insecure_password_list_hashed[i]<<" tried to crack with "<<password_to_crack<<std::endl; 
+ 
         }
     }
   
@@ -113,10 +147,9 @@ int main() {
             
     }
     
-
+    free(cracked_passwords, q);
     return 0;
 }
-
 
 
 
