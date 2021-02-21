@@ -21,7 +21,7 @@ else
     # Remove old output files
     rm *.sh.* > /dev/null 2>&1
     # Submit job using qsub
-    qsub_id=`qsub -l nodes=1:gpu:ppn=2 -d . $script`
+    qsub_id=`qsub -l nodes=1:gpu:ppn=2:gen9 -d . $script`
     job_id="$(cut -d'.' -f1 <<<"$qsub_id")"
     # Print qstat output
     qstat 
@@ -36,7 +36,7 @@ else
         if [ $timeout == 60 ]; then
             echo ""
             echo ""
-            echo "TimeOut 60 seconds: Job is still queued for execution, check for output file later ($script.o$job_id)"
+            echo "TimeOut 260 seconds: Job is still queued for execution, check for output file later ($script.o$job_id)"
             echo ""
             break
         fi
